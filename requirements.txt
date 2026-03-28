@@ -11,7 +11,7 @@ PyPDF2
 pdfplumber
 PyGithub
 nltk
-google-generativeai
+google-genai
 fpdf2
 joblib
 requests

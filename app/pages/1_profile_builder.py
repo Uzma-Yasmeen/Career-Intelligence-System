@@ -3,7 +3,7 @@ import sys
 import os
 import re
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from utils.firebase_auth import is_logged_in
 from utils.pdf_parser import parse_resume
 from utils.github_analyser import analyse_github_profile, SKILLS_LIST

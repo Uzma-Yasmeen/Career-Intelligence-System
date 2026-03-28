@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# Career-Intelligence-System
-=======
 # AI Career Intelligence System 🚀
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
@@ -27,7 +24,7 @@ An explainable, data-driven framework for software engineering career progressio
 
 - **Frontend:** Streamlit
 - **Machine Learning:** Scikit-learn, XGBoost, SHAP
-- **LLM Integration:** Google Gemini API (`google-generativeai`)
+- **LLM Integration:** Google Gemini API (`google-genai`)
 - **Data Processing:** Pandas, NumPy
 - **Storage/Auth:** Firebase (Firestore & Auth)
 - **Reporting:** fpdf2 (PDF Generation)
@@ -86,4 +83,4 @@ The models were trained on 60,000+ responses from the Stack Overflow Developer S
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
->>>>>>> c74d720 (🚀 Initial Release: AI Career Intelligence System)
+

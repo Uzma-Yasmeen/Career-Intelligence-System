@@ -2,7 +2,7 @@ import streamlit as st
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from utils.firebase_auth import is_logged_in, get_current_user
 from utils.gemini_narrative import generate_career_narrative
 from utils.firestore_db import save_analysis

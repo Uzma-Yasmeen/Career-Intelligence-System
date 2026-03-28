@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from utils.firebase_auth import is_logged_in
 from utils.model_loader import load_models
 from utils.currency import format_salary, format_currency_amount, get_currency_info

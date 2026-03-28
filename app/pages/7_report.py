@@ -2,7 +2,7 @@ import streamlit as st
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from utils.firebase_auth import is_logged_in
 from utils.report_generator import generate_pdf_report
 from utils.currency import format_salary

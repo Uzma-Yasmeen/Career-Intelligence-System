@@ -3,3 +3,4 @@ libgl1-mesa-dev
 libglu1-mesa-dev
 zlib1g-dev
 libjpeg-dev
+libgomp1
