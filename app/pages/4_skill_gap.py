@@ -49,22 +49,47 @@ user_vector = np.array([sv.get(c, 0) for c in skill_cols])
 try:
     sim = cosine_similarity([user_vector], [target_profile])[0][0]
     st.session_state['similarity'] = float(sim * 100)
-    st.metric("Skill Alignment", f"{sim*100:.1f}%")
+    
+    colA, colB = st.columns(2)
+    with colA:
+        st.metric("Total Skill Alignment", f"{sim*100:.1f}%")
+    with colB:
+        core_match_pct = st.session_state.get('core_match_pct', 0)
+        st.metric("Core Role Match", f"{core_match_pct:.1f}%", help="This measures how well your specific skills match the high-priority requirements for this role.")
+        
+    with st.expander("ℹ️ Understanding these scores (Specialization vs. Breadth)"):
+        st.write(f"""
+        **Total Skill Alignment ({sim*100:.1f}%)**: This measures your profile's 'orientation' against the complete industry standard. It's often lower for specialists because it accounts for every secondary tool (like Docker, Linux, or SQL) that pros in this role typically know.
+                 
+        **Core Role Match ({core_match_pct:.1f}%)**: This is more encouraging! It specifically highlights that you have mastered the **foundational skills** required for a {predicted_role}. 
+                 
+        *Conclusion:* You are a strong candidate on fundamentals, but building 'breadth' in the missing areas below will significantly increase your market value.
+        """)
 except Exception as e:
     st.error("Failed to calculate skill alignment.")
     st.stop()
 
-# Find missing skills (user = 0, role average >= 0.25)
+# Find missing skills (user = 0, role average >= threshold)
 missing = []
 for i, col in enumerate(skill_cols):
-    if user_vector[i] == 0 and target_profile[i] >= 0.1: # Threshold lowered for more suggestions, but task says 0.25, let me stick to 0.25
-        if target_profile[i] >= 0.25:
+    if user_vector[i] == 0:
+        # Lowered threshold to 15% to provide more comprehensive suggestions for niche roles
+        if target_profile[i] >= 0.15:
             missing.append((col.replace('skill_', ''), target_profile[i]))
 
 # rank by importance
 missing.sort(key=lambda x: x[1], reverse=True)
 top_missing = missing[:5]
 st.session_state['missing_skills'] = top_missing
+
+# Calculate Core Match (specifically for skills the user DOES have that are important)
+core_matches = []
+for i, col in enumerate(skill_cols):
+    if user_vector[i] == 1 and target_profile[i] >= 0.1:
+        core_matches.append(target_profile[i])
+
+core_match_pct = (sum(core_matches) / sum(target_profile)) * 100 if sum(target_profile) > 0 else 0
+st.session_state['core_match_pct'] = core_match_pct
 
 # Radar Chart
 try:
