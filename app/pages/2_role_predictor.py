@@ -96,7 +96,7 @@ st.session_state['predicted_role'] = predicted_role
 st.session_state['role_probs'] = role_probs
 
 # ── Prediction heading ────────────────────────────────────
-st.success(f"### Your best match: **{predicted_role}** ({confidence:.1f}% confidence)")
+st.success(f"### Best Match: **{predicted_role}** — AI Confidence: {confidence:.1f}%")
 
 # ── Confidence bar chart ──────────────────────────────────
 try:

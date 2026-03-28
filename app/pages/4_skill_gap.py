@@ -39,6 +39,7 @@ if predicted_role is None or predicted_role not in role_profiles.index:
         st.switch_page("pages/2_role_predictor.py")
     st.stop()
 
+# --- CALCULATION LOGIC (BEFORE UI) ---
 # Build user vector matching the exact columns of role_profiles
 target_profile = role_profiles.loc[predicted_role].values
 skill_cols = role_profiles.columns
@@ -46,50 +47,44 @@ skill_cols = role_profiles.columns
 sv = st.session_state.get('skill_vector', {})
 user_vector = np.array([sv.get(c, 0) for c in skill_cols])
 
+# 1. Total Alignment (Cosine)
 try:
     sim = cosine_similarity([user_vector], [target_profile])[0][0]
     st.session_state['similarity'] = float(sim * 100)
-    
-    colA, colB = st.columns(2)
-    with colA:
-        st.metric("Total Skill Alignment", f"{sim*100:.1f}%")
-    with colB:
-        core_match_pct = st.session_state.get('core_match_pct', 0)
-        st.metric("Core Role Match", f"{core_match_pct:.1f}%", help="This measures how well your specific skills match the high-priority requirements for this role.")
-        
-    with st.expander("ℹ️ Understanding these scores (Specialization vs. Breadth)"):
-        st.write(f"""
-        **Total Skill Alignment ({sim*100:.1f}%)**: This measures your profile's 'orientation' against the complete industry standard. It's often lower for specialists because it accounts for every secondary tool (like Docker, Linux, or SQL) that pros in this role typically know.
-                 
-        **Core Role Match ({core_match_pct:.1f}%)**: This is more encouraging! It specifically highlights that you have mastered the **foundational skills** required for a {predicted_role}. 
-                 
-        *Conclusion:* You are a strong candidate on fundamentals, but building 'breadth' in the missing areas below will significantly increase your market value.
-        """)
-except Exception as e:
-    st.error("Failed to calculate skill alignment.")
-    st.stop()
+except:
+    sim = 0
 
-# Find missing skills (user = 0, role average >= threshold)
+# 2. Missing Skills (Top 5)
 missing = []
 for i, col in enumerate(skill_cols):
     if user_vector[i] == 0:
-        # Lowered threshold to 15% to provide more comprehensive suggestions for niche roles
         if target_profile[i] >= 0.15:
             missing.append((col.replace('skill_', ''), target_profile[i]))
-
-# rank by importance
 missing.sort(key=lambda x: x[1], reverse=True)
 top_missing = missing[:5]
 st.session_state['missing_skills'] = top_missing
 
-# Calculate Core Match (specifically for skills the user DOES have that are important)
-core_matches = []
-for i, col in enumerate(skill_cols):
-    if user_vector[i] == 1 and target_profile[i] >= 0.1:
-        core_matches.append(target_profile[i])
+# 3. Core Competency Score (weighted match on Top 5 skills used in the role)
+top_5_indices = target_profile.argsort()[-5:][::-1]
+user_has_count = sum([user_vector[i] for i in top_5_indices])
+core_comp_score = (user_has_count / 5.0) * 100
+st.session_state['core_comp_score'] = core_comp_score
 
-core_match_pct = (sum(core_matches) / sum(target_profile)) * 100 if sum(target_profile) > 0 else 0
-st.session_state['core_match_pct'] = core_match_pct
+# --- UI SECTION ---
+colA, colB = st.columns(2)
+with colA:
+    st.metric("Overall Profile Match", f"{sim*100:.1f}%")
+with colB:
+    st.metric("Core Competency Score", f"{core_comp_score:.1f}%", help="Out of the top 5 foundational skills for this role, how many do you have?")
+    
+with st.expander("ℹ️ Understanding these scores (Specialization vs. Breadth)"):
+    st.write(f"""
+    **Overall Profile Match ({sim*100:.1f}%)**: This measures your profile's 'orientation' against the complete industry standard. It's often lower for specialists because it accounts for every secondary tool (like Docker, Linux, or SQL) that pros in this role typically know.
+                
+    **Core Competency Score ({core_comp_score:.1f}%)**: This specifically highlights that you have mastered **{user_has_count} out of the Top 5 foundational skills** required for a {predicted_role}. 
+                
+    *Conclusion:* You are a strong candidate on fundamentals, but building 'breadth' in the missing areas below will significantly increase your market value.
+    """)
 
 # Radar Chart
 try:
@@ -134,8 +129,7 @@ except Exception as e:
 st.subheader(f"Top 5 Skills to Learn for {predicted_role}")
 if top_missing:
     for skill, imp in top_missing:
-        st.write(f"**{skill}** (Current usage in role: {imp*100:.0f}%)")
-        # Ensure progress bar value is between 0 and 1
+        st.write(f"**{skill}** (Usage in role: {imp*100:.0f}%)")
         st.progress(float(min(max(imp, 0.0), 1.0)))
 else:
     st.success("You have no major missing skills for this role!")
