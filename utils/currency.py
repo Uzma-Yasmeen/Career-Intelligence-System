@@ -29,11 +29,16 @@ def format_currency_amount(amount_usd, country, always_full=False):
     info = get_currency_info(country)
     local_val = amount_usd * info['rate']
     
+    prefix = "-" if local_val < 0 else ""
+    abs_val = abs(local_val)
+    
     if country == "United States" or info['code'] == "USD":
-        return f"${local_val:,.0f}"
+        return f"{prefix}${abs_val:,.0f}"
         
     if country == "India" and not always_full:
-        if abs(local_val) >= 100000:
-            return f"{info['sym']}{(local_val/100000.0):.1f} LPA"
-        return f"{info['sym']}{local_val:,.0f}"
-    return f"{info['sym']}{local_val:,.0f}"
+        if abs_val >= 100000:
+            lpa = abs_val / 100000.0
+            return f"{prefix}{info['sym']}{lpa:.1f} LPA"
+        return f"{prefix}{info['sym']}{abs_val:,.0f}"
+        
+    return f"{prefix}{info['sym']}{abs_val:,.0f}"

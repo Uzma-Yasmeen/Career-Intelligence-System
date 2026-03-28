@@ -210,27 +210,42 @@ if st.button("Predict Salary"):
                 
                 # Combine features with small impacts
                 imp_df = pd.DataFrame({'feature': features, 'val': shap_vals})
+                
+                # REMOVE country_encoded from the chart because it's a global benchmark, not a user factor
+                imp_df = imp_df[imp_df['feature'] != 'country_encoded']
+                
                 imp_df['abs_val'] = imp_df['val'].abs()
                 imp_df = imp_df.sort_values(by='abs_val', ascending=False)
                 
                 top_features = imp_df.head(10)
                 
-                # Display values in English
-                pe_labels = [get_plain_english_shap(f, X.iloc[0][f]) for f in top_features['feature']]
-                vals = top_features['val'].values
-                # Format text
-                text_vals = [("+" if v > 0 else "") + format_currency_amount(v, user_country) for v in vals]
-                colors = ['#1D9E75' if v > 0 else '#E24B4A' for v in vals]
+                pe_labels = []
+                vals = []
+                text_vals = []
+                colors = []
                 
-                # ADD "Other Factors" bar to balance the math
+                for _, row in top_features.iterrows():
+                    feat_name = row['feature']
+                    val_usd = row['val']
+                    
+                    label = get_plain_english_shap(feat_name, X.iloc[0][feat_name])
+                    pe_labels.append(label)
+                    vals.append(val_usd)
+                    
+                    # Positive (+) sign for growth
+                    sign = "+" if val_usd > 0 else ""
+                    text_vals.append(sign + format_currency_amount(val_usd, user_country))
+                    colors.append('#1D9E75' if val_usd > 0 else '#E24B4A')
+
+                # ADD "Other Factors" bar to balance the math if significant
                 top_10_sum = sum(vals)
-                other_sum = diff - top_10_sum
+                other_sum = diff - top_10_sum - (shap_vals[features.tolist().index('country_encoded')] if 'country_encoded' in features.tolist() else 0)
                 
-                if abs(other_sum) > 500: # Only add if significant
-                    pe_labels = list(pe_labels) + ["Miscellaneous Factors"]
-                    vals = np.append(vals, other_sum)
-                    text_vals = list(text_vals) + [("+" if other_sum > 0 else "") + format_currency_amount(other_sum, user_country)]
-                    colors = list(colors) + ["#777777"]
+                if abs(other_sum) > 500: 
+                    pe_labels.append("Miscellaneous Factors")
+                    vals.append(other_sum)
+                    text_vals.append(("+" if other_sum > 0 else "") + format_currency_amount(other_sum, user_country))
+                    colors.append("#777777")
 
                 pe_labels_rev = list(reversed(pe_labels))
                 vals_rev = list(reversed(vals))
@@ -238,15 +253,15 @@ if st.button("Predict Salary"):
                 colors_rev = list(reversed(colors))
                 
                 fig_shap = go.Figure(go.Bar(
-                    x=vals_rev, y=pe_labels_rev, orientation='h', text=text_vals_rev, textposition='outside',
+                    x=vals_rev, y=pe_labels_rev, orientation='h', text=text_vals_rev, textposition='auto',
                     marker_color=colors_rev
                 ))
                 fig_shap.update_layout(
-                    title="Salary Profile Adjustments", 
+                    title="Salary Profile Adjustments (Localized Impacts)", 
                     xaxis_title=f"Impact amount ({sym})", 
                     yaxis_title="Profile Factor",
-                    margin=dict(l=200, r=100), # Add space for labels
-                    height=max(400, 40 * len(pe_labels_rev))
+                    margin=dict(l=200, r=100),
+                    height=max(450, 40 * len(pe_labels_rev))
                 )
                 st.plotly_chart(fig_shap)
                 

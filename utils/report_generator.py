@@ -66,22 +66,44 @@ def generate_pdf_report(role, salary_str, similarity, missing_skills, selected_s
     pdf.multi_cell(0, 6, skills_text)
     pdf.ln(5)
 
-    # 4. Skill Gaps & Roadmap
+    # 4. Roadmap & Skill Gaps
     pdf.set_font("Arial", 'B', 14)
     pdf.set_text_color(127, 119, 221)
-    pdf.cell(0, 10, "90-Day Learning Roadmap (Skill Gaps)", 0, 1)
+    pdf.cell(0, 10, "90-Day Learning Roadmap", 0, 1)
+    pdf.set_draw_color(127, 119, 221)
+    pdf.line(pdf.get_x(), pdf.get_y(), pdf.get_x() + 50, pdf.get_y())
+    pdf.ln(5)
     
-    pdf.set_font("Arial", '', 11)
-    pdf.set_text_color(0, 0, 0)
-    
+    # Skill-specific intelligence mapping
+    sk_map = {
+        'Python': "Focus on advanced libraries like Pandas/NumPy and OOP principles. Build a data-intensive automation script.",
+        'JavaScript': "Master ES6+ features, asynchronous programming (Promises/Async-Await), and DOM manipulation.",
+        'TypeScript': "Implement strict typing in a project. Learn interface vs. type, generics, and configuration.",
+        'Java': "Explore Spring Boot, Multithreading, and JVM internals. Build a scalable REST API.",
+        'SQL': "Master Joins, CTEs, and Window functions. Optimize slow queries and understand database normalization.",
+        'Docker': "Containerize a full-stack application. Learn multi-stage builds and Docker Compose orchestration.",
+        'Kubernetes': "Deploy a cluster, manage pods, and understand ingress/services. Look into Helm charts.",
+        'React': "Learn Hooks (useEffect, useMemo), State Management (Redux/Zustand), and component lifecycle.",
+        'Node.js': "Build an Event-driven backend. Learn express middleware, filesystem, and worker threads.",
+        'AWS': "Get familiar with EC2, S3, and Lambda. Aim for the AWS Cloud Practitioner concepts.",
+        'Git': "Master branching strategies, rebase vs. merge, and resolving complex conflicts.",
+        'Linux': "Master command-line navigation, shell scripting, and process management."
+    }
+
     if missing_skills:
-        for i, (sk, imp) in enumerate(missing_skills):
+        for i, (sk, imp) in enumerate(missing_skills[:5]): # Top 5 gaps
             pdf.set_font("Arial", 'B', 11)
-            pdf.cell(0, 6, f"{i+1}. {sk}", 0, 1)
-            pdf.set_font("Arial", '', 11)
-            pdf.multi_cell(0, 6, f"Priority learning area to close the gap for the {role} position. Consider short online courses or projects incorporating {sk}.")
-            pdf.ln(2)
+            pdf.set_text_color(40, 40, 40)
+            priority = "Critical" if imp > 0.5 else "High" if imp > 0.3 else "Medium"
+            pdf.cell(0, 6, f"{i+1}. {sk} — Priority: {priority}", 0, 1)
+            
+            pdf.set_font("Arial", '', 10)
+            pdf.set_text_color(80, 80, 80)
+            desc = sk_map.get(sk, f"Essential technology for {role} professionals. Focus on building 2-3 mini-projects to master its core features and syntactical nuances.")
+            pdf.multi_cell(0, 5, desc)
+            pdf.ln(3)
     else:
+        pdf.set_font("Arial", '', 11)
         pdf.cell(0, 6, "Excellent! You have a high match with no major skill gaps detected.", 0, 1)
 
     # Output to bytes
