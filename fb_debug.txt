@@ -1,0 +1,15 @@
+Using API Key: AIzaSyDbFsVYtoqLM3NumxldqjZNMYeW3tpTzuY
+Status Code: 400
+Response: {
+  "error": {
+    "code": 400,
+    "message": "CONFIGURATION_NOT_FOUND",
+    "errors": [
+      {
+        "message": "CONFIGURATION_NOT_FOUND",
+        "domain": "global",
+        "reason": "invalid"
+      }
+    ]
+  }
+}

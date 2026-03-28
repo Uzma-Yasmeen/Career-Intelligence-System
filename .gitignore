@@ -1,0 +1,11 @@
+venv/
+.venv/
+data/
+firebase-key.json
+.streamlit/secrets.toml
+__pycache__/
+*.pyc
+.env
+.ipynb_checkpoints/
+.DS_Store
+*.log
