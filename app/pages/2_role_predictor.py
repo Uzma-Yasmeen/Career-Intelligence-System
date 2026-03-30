@@ -216,7 +216,7 @@ st.markdown("---")
 @st.cache_data
 def load_scatter_data():
     csv_path = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)),
+        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
         'data', 'clean_survey.csv'
     )
     if os.path.exists(csv_path):
