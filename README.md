@@ -4,6 +4,10 @@
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.32.0-red.svg)](https://streamlit.io/)
 [![XGBoost](https://img.shields.io/badge/XGBoost-1.7.6-orange.svg)](https://xgboost.ai/)
 [![Gemini](https://img.shields.io/badge/Google-Gemini_2.0-green.svg)](https://aistudio.google.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Live App](https://img.shields.io/badge/Live_App-Streamlit-FF4B4B.svg)](https://career-intelligence-system-0911.streamlit.app/)
+
+**[Open the live app](https://career-intelligence-system-0911.streamlit.app/)** | **[GitHub repository](https://github.com/Uzma-Yasmeen/Career-Intelligence-System)**
 
 An explainable, data-driven framework for software engineering career progression. This project leverages the Stack Overflow Developer Survey data to provide localized salary benchmarks, role forecasting, and personalized upskilling roadmaps using Gradient Boosting and Generative AI.
 
