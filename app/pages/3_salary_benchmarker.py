@@ -7,7 +7,7 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from utils.firebase_auth import is_logged_in
-from utils.model_loader import load_models
+from utils.model_loader import load_models, match_education
 from utils.currency import format_salary, format_currency_amount, get_currency_info
 from utils.feature_names import get_plain_english_shap, get_plain_english_feature
 from utils.salary_calibration import calibrate_salary, get_calibrated_salary_range
@@ -61,7 +61,7 @@ def get_full_input_df():
     
     le_ed = models['le_ed']
     ed_val = st.session_state.get('education', 'Missing')
-    if ed_val not in le_ed.classes_: ed_val = 'Missing' if 'Missing' in le_ed.classes_ else le_ed.classes_[0]
+    ed_val = match_education(le_ed, ed_val)
     df['ed_encoded'] = le_ed.transform([ed_val])[0]
     
     le_org = models['le_org']

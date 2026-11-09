@@ -8,7 +8,7 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from utils.firebase_auth import is_logged_in
-from utils.model_loader import load_models
+from utils.model_loader import load_models, match_education
 
 # if not is_logged_in():
 #     st.switch_page("pages/2_login.py")
@@ -47,8 +47,7 @@ def get_input_df():
 
     le_ed = models['le_ed']
     ed_val = st.session_state.get('education', 'Missing')
-    if ed_val not in le_ed.classes_:
-        ed_val = le_ed.classes_[0]
+    ed_val = match_education(le_ed, ed_val)
     df['ed_encoded'] = le_ed.transform([ed_val])[0]
 
     le_org = models['le_org']
@@ -81,6 +80,7 @@ try:
     role_classes = le_role.inverse_transform(role_model.classes_)
 except Exception as e:
     st.error("Prediction failed. Please go back and ensure your profile is complete.")
+    print(f"Role prediction error: {e}")
     if st.button("← Go Back"):
         st.switch_page("pages/1_profile_builder.py")
     st.stop()
